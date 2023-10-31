@@ -138,7 +138,7 @@ namespace Core_Mk1
         }
 
     }
-    public class ElementalUniCharacteristic : UniCharacteristic
+    public abstract class ElementalUniCharacteristic : UniCharacteristic
     {
         public ElementalUniCharacteristic(double value) : base(value)
         {

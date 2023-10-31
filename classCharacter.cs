@@ -162,29 +162,5 @@ namespace Core_Mk1
                 statList[masteryStat] = characteristics[masteryStat].CalculateDerivatives();
             }
         }
-        public double CalculateMaxMana(double masteryValue)
-                {
-                    return Math.Floor(10 + masteryValue / 2);
-                }
-        public double CalculateCurrentMana(double masteryValue)
-                {
-                    return Math.Floor(masteryValue / 5);
-                }
-        public double CalculateTerminationMult(double masteryValue)
-                {
-                    return 1.0 + masteryValue / 100.0;
-                }
-        public double CalculateAddTurnChance(double masteryValue)
-                {
-                    return masteryValue / 400.0;
-                }
-        public double CalculateResistance(double masteryValue)
-                {
-                    return masteryValue / 200.0;
-                }
-        public double CalculateMaxHealth(double masteryValue)
-        {
-            return Math.Floor(50 + masteryValue * 4);
-        }
     }
 }
