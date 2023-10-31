@@ -1,4 +1,4 @@
-﻿using Core_Mk1;
+using Core_Mk1;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,22 +50,22 @@ namespace Core_Mk1
             };
             return derivatives;
         }
-        /*public override double CalculateTerminationMult()
+        public override double CalculateTerminationMult()
         {
-            double result = 1;
-
+            double result;
+            result = value/4;
             return result;
-        }*/
-        /*public override double CalculateAddTurnChance()
+        }
+        public override double CalculateAddTurnChance()
         {
-            double result = 1;
-
+            double result;
+            result = value/5;
             return result;
-        }*/
+        }
         public double CalculateResistance()
         {
-            double result = 1;
-
+            double result;
+            result = value/5;
             return result;
         }
     }
@@ -86,18 +86,18 @@ namespace Core_Mk1
             };
             return derivatives;
         }
-        /*public override double CalculateTerminationMult()
+        public override double CalculateTerminationMult()
         {
-            double result = 1;
-
+            double result;
+            result = value/3;
             return result;
-        }*/
-        /*public override double CalculateAddTurnChance()
+        }
+        public override double CalculateAddTurnChance()
         {
-            double result = 1;
-
+            double result;
+            result = value/3;
             return result;
-        }*/
+        }
     }
     public class Endurance : UniCharacteristic
     {
@@ -118,22 +118,22 @@ namespace Core_Mk1
             };
             return derivatives;
         }
-        /*public override double CalculateTerminationMult()
+        public override double CalculateTerminationMult()
         {
-            double result = 1;
-
+            double result;
+            result = value/3;
             return result;
-        }*/
-        /*public override double CalculateAddTurnChance()
+        }
+        public override double CalculateAddTurnChance()
         {
-            double result = 1;
-
+            double result;
+            result = value/3;
             return result;
-        }*/
+        }
         public double CalculateMaxHealth()
         {
-            double result = 1;
-
+            double result;
+            result = 100 + value*2;
             return result;
         }
 
@@ -155,28 +155,28 @@ namespace Core_Mk1
             };
             return derivatives;
         }
-        /*public override double CalculateTerminationMult()
+        public override double CalculateTerminationMult()
         {
-            double result = 1;
-
+            double result;
+            result = value/4;
             return result;
-        }*/
-        /*public override double CalculateAddTurnChance()
+        }
+        public override double CalculateAddTurnChance()
         {
-            double result = 1;
-
+            double result;
+            result = value/5;
             return result;
-        }*/
+        }
         public virtual double CalculateMaxMana()
         {
-            double result = 1;
-
+            double result;
+            result = 10 + value/2;
             return result;
         }
         public virtual double CalculateCurrentMana()
         {
-            double result = 1;
-
+            double result;
+            result = value/5;
             return result;
         }
     }
