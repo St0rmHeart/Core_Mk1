@@ -9,81 +9,108 @@ namespace Core_Mk1
     /// <summary>
     /// Класс, в хором хранится вся информация, определющая степень развития персонажа
     /// </summary>
-    public class Character : CharacteristicEnumeration
+    public class Character
     {
-        //имя персонажа
+        //_____________________КОНСТРУКТОР_____________________
+        /// <summary>
+        /// Базовый конструктор персонажа.
+        /// </summary>
+        /// <param name="name">Имя</param>
+        /// <param name="level">Уровень</param>
+        /// <param name="xp">Текущее количество опыта</param>
+        /// <param name="gold">Текущее количество золота</param>
+        public Character(string name, int level = 0, int xp = 0, int gold = 0)
+        {
+            this.name = name;
+            this.level = level;
+            this.xp = xp;
+            this.gold = gold;
+
+            foreach (EBodyPart bodyPart in Enum.GetValues(typeof(EBodyPart)))
+            {
+                usedEquipment.Add(bodyPart, null);
+            }
+
+        }
+
+
+
+        //_____________________ПОЛЯ_____________________
+
+        //имя 
         protected string name;
+        //уровень 
+        protected int level;
+        //накопленный опыт на уровне 
+        protected int xp;
+        //накопленное золото
+        protected int gold;
+        //базовые характеристики
+        protected Dictionary<ECharacteristic, int> characteristics = new Dictionary<ECharacteristic, int>();
+        //используемые перки
+        protected List<Perk> usedPerks = new List<Perk>();
+        //носимое снаряжение
+        protected Dictionary<EBodyPart, Equipment> usedEquipment = new Dictionary<EBodyPart, Equipment>();
+        //используемые заклинания
+        protected List<Spell> usedSpells = new List<Spell>();
+
+
+
+        //_____________________GET/SET_____________________
+
+        //get/set имя персонажа
         public string Name
         {
             get { return name; }
             set { name = value; }
         }
-        protected int level;
-        protected int xp;
+
+        //get уровень персонажа
+        public int Level
+        {
+            get { return level; }
+        }
+
+        //get/set опыт на текущем уровне 
         public int Xp
         {
             get { return xp; }
             set { xp = value; }
         }
-        protected int gold;
+
+        //get/set количество золота 
         public int Gold
         {
             get { return gold; }
             set { gold = value; }
         }
 
-        //Основные характеристики
-        protected Dictionary<Characteristic, UniCharacteristic> characteristics = new Dictionary<Characteristic, UniCharacteristic>();
-        //носимое снаряжение
-        protected Dictionary<BodyPart, Equipment> usedEquipment = new Dictionary<BodyPart, Equipment>();
-        //используемые перки
-        protected Dictionary<int, Perk> usedPerks = new Dictionary<int, Perk>();
-        //используемые заклинания
-        protected Dictionary<int, Spell> usedSpells = new Dictionary<int, Spell>();
-        
-
-        //методы
-        public Character(string name) //конструктор
+        /// <summary>
+        /// get/set значение характеристики
+        /// </summary>
+        /// <param name="characteristic">Характеристика, к которой обращаемся</param>
+        /// <returns></returns>
+        public int this[ECharacteristic characteristic] 
         {
-            this.name = name;
-            level = 0;
-            xp = 0;
-            gold = 0;
-            characteristics.Add(Characteristic.strength,  new Strength(0));
-            characteristics.Add(Characteristic.dexterity, new Dexterity(0,gold));
-            characteristics.Add(Characteristic.endurance, new Endurance(0,xp));
-            characteristics.Add(Characteristic.fire,      new Fire(0));
-            characteristics.Add(Characteristic.water,     new Water(0));
-            characteristics.Add(Characteristic.air,       new Air(0));
-            characteristics.Add(Characteristic.earth,     new Earth(0));
-
-
-            foreach (BodyPart bodyPart in Enum.GetValues(typeof(BodyPart)))
-            {
-                usedEquipment.Add(bodyPart, null);
-            }
-            for (int i = 0; i < 5; i++)
-            {
-                usedPerks.Add(i+1, null);
-            }
-            for (int i = 0; i < 8; i++)
-            {
-                usedSpells.Add(i+1, null);
-            }
-
+            get { return characteristics[characteristic];  }
+            set { characteristics[characteristic] = value; }
         }
-        public double this[Characteristic param] //получение/запись значений характеристики
+
+        //get список перков
+        public List<Perk> UsedPerks
         {
-            get
-            {
-                return characteristics[param].Value;
-            }
-            set
-            {
-                characteristics[param].Value = value;
-            }
+            get { return usedPerks; }
         }
-        
+        //get словарь снаряжения
+        public Dictionary<EBodyPart, Equipment> UsedEquipment
+        {
+            get { return usedEquipment; }
+        }
+
+
+
+        //_____________________МЕТОДЫ_____________________
+
         /// <summary>
         /// Отображение базовых характеристик, экиперованных предметов, перков и заклинаний.
         /// </summary>
@@ -108,34 +135,22 @@ namespace Core_Mk1
                 }   
             }
             Console.WriteLine("Используемые перки:");
-            foreach (var slot in usedPerks.Keys)
+            foreach (Perk slot in usedPerks)
             {
-                if (usedPerks[slot] == null)
-                {
-                    Console.WriteLine($"\t{slot} = {usedPerks[slot]}");
-                }
-                else
-                {
-                    Console.WriteLine($"\t{slot} = {usedPerks[slot].Name}");
-                }
+                Console.WriteLine($"\t{slot.Name}");
             }
             Console.WriteLine("Используемые заклинания:");
-            foreach (var slot in usedSpells.Keys)
+            foreach (Spell slot in usedSpells)
             {
-                if (usedSpells[slot] == null)
-                {
-                    Console.WriteLine($"\t{slot} = {usedSpells[slot]}");
-                }
-                else
-                {
-                    Console.WriteLine($"\t{slot} = {usedSpells[slot].Name}");
-                }
+                Console.WriteLine($"\t{slot.Name}");
             }
         }
-        
+
         /// <summary>
-        /// Попытаться одеть на персонажа предмет или заменить уже одетый на другой с тем же слотом.
+        /// Попытаться одеть на персонажа предмет или заменить уже одетый на другой.
         /// </summary>
+        /// <param name="thing">Предмет, который мы пытаемся экиперовать</param>
+        /// <returns></returns>
         public bool TryEquip(Equipment thing)
         {
             if (thing.IsPossibleToEquip(this))
@@ -145,22 +160,5 @@ namespace Core_Mk1
             }
             return false;
         }
-
-        public void InitStats()
-        {
-            //пименяем ВСЕ пассивные эффекты ВСЕГО носимого снаряжения
-            foreach (BodyPart bodyPart in usedEquipment.Keys)
-            {
-                if (usedEquipment[bodyPart] != null && usedEquipment[bodyPart].IsPassive)
-                {
-                    usedEquipment[bodyPart].ApplyEffect(source: this, purpose: this);
-                }
-            }
-            //Высчитываем ВСЕ производные параметры характеристик и записываем или прибавляем их
-            foreach (var masteryStat in statList.Keys)
-            {
-                statList[masteryStat] = characteristics[masteryStat].CalculateDerivatives();
-            }
-        }
     }
-}
+}   

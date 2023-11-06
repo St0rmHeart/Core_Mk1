@@ -7,58 +7,51 @@ using System.Threading.Tasks;
 namespace Core_Mk1
 {
     /// <summary>
-    /// виды камней, которые могут быть на игровой доске
+    /// Все характеристики, необходимые для описания параметров персонажа, снаряжения, перков, заклинаний, эффектов и всего прочего
     /// </summary>
-    public enum TriggerType
+    public enum ECharacteristic
     {
-        passive,
-        skull,
-        fire,
-        water,
-        air,
-        earth,
-        exp,
-        gold
+        strength,       //сила
+        dexterity,      //ловкость
+        endurance,      //выносливость
+        fire,           //мастерство огня
+        water,          //мастерство земли
+        air,            //мастерство воздуха
+        earth,          //мастерство земли
     }
     /// <summary>
-    /// Основные характеристики персонажа, определяющие его развитие
+    /// Указатель для эфектов/скейлов, настоятся/обращаются они по/к владельцу или противнику
     /// </summary>
-    public enum Characteristic
+    public enum EPlayerType
     {
-        strength,
-        dexterity,
-        endurance,
-        fire,
-        water,
-        air,
-        earth,
-        level,
+        self,           //обращаемся к владельцу
+        enemy           //обращаемся к простивнику
     }
-
     /// <summary>
-    /// Производные от <see cref="Characteristic"/> характеристики, 
+    /// Всевозможное производные параметры от каждой <see cref="ECharacteristic"/>.
+    /// у КАЖДОЙ <see cref="ECharacteristic"/> может быть СВОЙ набор из <see cref="EDerivative"/>
     /// </summary>
-    public enum Derivative
+    public enum EDerivative
     {
-        value,
-        maxMana,
-        currentMana,
-        terminationMult,
-        addTurnChance,
-        resistance,
-        maxHealth,      
-        currentHealth,  
+        value,          //значение характеристики
+        maxMana,        //максимальный запас маны
+        currentMana,    //текущий(стартовый) запас маны
+        terminationMult,//мультипликатор эффекта уничтожения камня, связанного с характеристикой производной 
+        addTurnChance,  //шанс доп хода при уничтожении камня, связанного с характеристикой производной
+        resistance,     //сопротивления урону, связанному с этой характеристикой
+        maxHealth,      //максимальный запас здоровья
+        currentHealth,  //текущий(стартовый) запас здоровья
     }
     /// <summary>
     /// 6 "слотов" в в которые можно одевать снаряжение соответсвующего типа
     /// </summary>
-    public enum BodyPart
+    public enum EBodyPart
     {
-        head,
-        body,
-        hands,
-        feet,
-        weapon,
-        extra,
+        head,           //голова
+        body,           //тело
+        hands,          //руки
+        feet,           //ноги
+        weapon,         //оружие
+        extra,          //экста
     }
 }

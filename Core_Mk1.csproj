@@ -45,13 +45,13 @@
   <ItemGroup>
     <Compile Include="classBasicDevEntity.cs" />
     <Compile Include="classCharacter.cs" />
-    <Compile Include="classCharacterCard.cs" />
-    <Compile Include="classCharacteristicEnumeration.cs" />
+    <Compile Include="classCustomDataStructures.cs" />
+    <Compile Include="сentralGameplay.cs" />
     <Compile Include="classEffect.cs" />
     <Compile Include="classEquipment.cs" />
     <Compile Include="classPerk.cs" />
     <Compile Include="classSpell.cs" />
-    <Compile Include="classUniСharacteristic+.cs" />
+    <Compile Include="derivativesCalculator.cs" />
     <Compile Include="enums.cs" />
     <Compile Include="main.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

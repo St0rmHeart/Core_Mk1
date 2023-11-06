@@ -1,37 +1,126 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Core_Mk1
 {
-    public class Effect : CharacteristicEnumeration
+    /// <summary>
+    /// Совокупность всех манипуляций, происходящих с конкренным параметром персонажа, если эффект срабатывает
+    /// </summary>
+    public class CommonEffect
     {
+        //_____________________КОНСТРУКТОР_____________________
+
         /// <summary>
-        /// Значение эффекта по умолчанию
+        /// Стандартный конструктор эффекта
         /// </summary>
-        protected int value;
+        /// <param name="constant">Константа, которую эффект прибавит к текущему значению параметра</param>
+        public CommonEffect(double constant) { this.constant = constant; }
+
         /// <summary>
-        /// Установить/получить значение эффекта по умолчанию
+        /// Конструктор с предустаноской скейла
         /// </summary>
-        public int Value
+        /// <param name="source">От кого скейлится эффект</param>
+        /// <param name="scaleChar">От какой характеристики скейлится эффект</param>
+        /// <param name="scaleDer">От какой производной скейлится эффект</param>
+        /// <param name="value">Коэффициент с которым происходит скейл</param>
+        public CommonEffect(EPlayerType source, ECharacteristic scaleChar, EDerivative scaleDer, double value)
         {
-            get { return value; }
-            set { this.value = value; }
+            constant = 0;
+            scale.Add(source, new Dictionary<ECharacteristic, Dictionary<EDerivative, double>> { [scaleChar] = new Dictionary<EDerivative, double> { [scaleDer] = value } });
+        }
+        
+        
+        
+        //_____________________ПОЛЯ_____________________
+
+        //Константа, которую эффект прибавит к текущему значению параметра
+        protected double constant;
+        //Конструкция позволяющая изменить значение текущещего параметра на % от значения другого параметр
+        protected Dictionary<EPlayerType, Dictionary<ECharacteristic, Dictionary<EDerivative, double>>> scale = new Dictionary<EPlayerType, Dictionary<ECharacteristic, Dictionary<EDerivative, double>>>();
+
+
+
+        //_____________________GET/SET_____________________
+
+        //get/set constant
+        public double ConstanBuff
+        {
+            get { return constant; }
+            set { constant = value; }
         }
 
-        public Effect(int value) //Конструктор
-        {
-            this.value = value;
-        }
         /// <summary>
-        /// Установка скейла значения эффекта от какой-либо характеристики.
+        /// Установить/изменить изменение эффекта на % от других параметров.
         /// </summary>
-        public void AddScale(Characteristic characteristic, Derivative derivative, double value)
+        /// <param name="source">От кого скейлится эффект</param>
+        /// <param name="scaleChar">От какой характеристики скейлится эффект</param>
+        /// <param name="scaleDer">От какой производной скейлится эффект</param>
+        /// <param name="value">Коэффициент с которым происходит скейл</param>
+        public void SetOrChangeScale(EPlayerType source, ECharacteristic scaleChar, EDerivative scaleDer, double value)
         {
-            SetOrChangeStat(characteristic, derivative, value);
+            //проверка эффекта на наличие
+            if (scale.ContainsKey(source)) //скейла от source
+            {
+                //проверка эффекта на наличие
+                if (scale[source].ContainsKey(scaleChar)) //скейла от source от характеристики scaleChar
+                {
+                    //проверка эффекта на наличие
+                    if (scale[source][scaleChar].ContainsKey(scaleDer)) //скейла от source от характеристики scaleChar от её производной scaleDer
+                    {
+                        // задаём новый коэффиент указанного скейла
+                        scale[source][scaleChar][scaleDer] = value;
+                    }
+                    else
+                    {
+                        //добавляем скейл от производной scaleDer с коэффициентом value
+                        scale[source][scaleChar].Add(scaleDer, value);
+                    }
+                }
+                else
+                {
+                    //добавляем скейл от характеристики scaleChar от производной scaleDer с коэффициентом value
+                    scale[source].Add(scaleChar, new Dictionary<EDerivative, double> { [scaleDer] = value });
+                }
+            }
+            else
+            {
+                //добавляем скейл от source от характеристики scaleChar от производной scaleDer с коэффициентом value
+                scale.Add(source, new Dictionary<ECharacteristic, Dictionary<EDerivative, double>> { [scaleChar] = new Dictionary<EDerivative, double> { [scaleDer] = value } });
+            }
         }
 
+
+
+        //_____________________МЕТОДЫ_____________________
+
+        /// <summary>
+        /// Вычислить значение эффекта
+        /// </summary>
+        /// <param name="ownerStats">Параметры ВЛАДЕЛЬЦА эффекта</param>
+        /// <param name="enemyStats">Параметры ПРОТИВНИКА владельца эффекта</param>
+        /// <returns>Значение, на которое должен измениться параметр</returns>
+        public double CalculateDelta(CharacteristicEnumeration ownerStats, CharacteristicEnumeration enemyStats)
+        {
+            double resultValue = constant;
+            foreach (EPlayerType source in scale.Keys)
+            {
+                foreach (ECharacteristic scaleChar in scale[source].Keys)
+                {
+                    foreach (EDerivative scaleDer in scale[source][scaleChar].Keys)
+                    {
+                        if (source == EPlayerType.self)
+                        {
+                            resultValue += scale[source][scaleChar][scaleDer] * ownerStats[scaleChar][scaleDer];
+                        }
+                        else
+                        {
+                            resultValue += scale[source][scaleChar][scaleDer] * enemyStats[scaleChar][scaleDer];
+                        }
+                    }
+                }
+            }
+            return resultValue;
+        }
     }
 }

@@ -9,138 +9,160 @@ using System.Xml.Linq;
 namespace Core_Mk1
 {
     /// <summary>
-    /// Абстрактынй класс содержащий общие для перков, эффектов, снаряжения и заклинаний свойства
+    /// Абстрактынй класс содержащий общие для перков, снаряжения, заклинаний и статусов свойства
     /// </summary>
     public abstract class BasicDevEntity
     {
-        //_____________________НАЗВАНИЕ_____________________
+        //_____________________КОНСТРУКТОР_____________________
 
         /// <summary>
-        /// Название сущности
+        /// Стандартный конструктор игровой сущности
         /// </summary>
-        protected String name;
+        /// <param name="name">Название сущности</param>
+        public BasicDevEntity(string name) { this.name = name; }
+
+
+
+        //_____________________ПОЛЯ_____________________
+
+        //Название 
+        protected string name;
+        //Подробное описание 
+        protected string description;
+        //Минимальные значение характеристик, которыми должен обладать персонаж, для использования сущности
+        protected Dictionary<ECharacteristic, int> requirementToUse = new Dictionary<ECharacteristic, int>();
+        //Словарь всех срабатывающих эффектов сущности при её активации
+        protected Dictionary<EPlayerType, Dictionary<ECharacteristic, Dictionary<EDerivative, CommonEffect>>> effect = new Dictionary<EPlayerType, Dictionary<ECharacteristic, Dictionary<EDerivative, CommonEffect>>>();
+
+
+
+        //_____________________GET/SET_____________________
+
+        //get/set name
         public string Name
         {
             get { return name; }
             set { name = value; }
         }
-        
 
-        //_____________________ОПИСАНИЕ_____________________
-
-        /// <summary>
-        /// Подробное описание сущности
-        /// </summary>
-        protected String description;
+        //get/set description
         public string Description
         {
             get { return description; }
             set { description = value; }
         }
 
-        //_____________________ТРЕБОВАНИЯ ДЛЯ ИСПОЛЬЗОВАНИЯ_____________________
+        //get словарь всех эффектов
+        public Dictionary<EPlayerType, Dictionary<ECharacteristic, Dictionary<EDerivative, CommonEffect>>> Effect
+        {
+            get { return effect; }
+        }
 
         /// <summary>
-        /// Минимальные значение характеристик, которыми должен обладать персонаж, для использования сущности
+        /// get/set требование для использования
         /// </summary>
-        protected Dictionary<Characteristic, int> requirementToUse = new Dictionary<Characteristic, int>();
-        public void SetRequirementToUse(Characteristic characteristic, int requirement)
-        {
-            if (requirementToUse.ContainsKey(characteristic)) 
-            {
-                requirementToUse[characteristic] = requirement;
-            }
-            else
-            {
-                requirementToUse.Add(characteristic, requirement);
-            }
-        }
-        public int GetRequirementToUse(Characteristic characteristic)
-        {
-            return requirementToUse[characteristic];
-        }
-        public int this[Characteristic param]
+        /// <param name="characteristic">Установить порог, не меньше которого должна быть базовая характеристика персонажа</param>
+        /// <returns></returns>
+        public int this[ECharacteristic characteristic]
         {
             get
             {
-                return requirementToUse[param];
+                return requirementToUse[characteristic];
             }
             set
             {
-                requirementToUse[param] = value;
+                requirementToUse[characteristic] = value;
             }
         }
-
-
-
-
-        //_____________________УСЛОВИЯ СРАБАТЫВАНИЯ_____________________
 
         /// <summary>
-        /// Условия, связанны с уничтожением определённых камней определённого типа на доске
+        /// Установка/изменение эффекта, который бдует срабатывать при активации сущности.
         /// </summary>
-        protected Dictionary<TriggerType, (int value, char comparison) > trigger = new Dictionary<TriggerType, (int value, char comparison) >();
-        public void SetTrigger(TriggerType stonetype, int value, char comparison)
+        /// <param name="target">На кого воздействеут эффект</param>
+        /// <param name="targetChar">На какую характеристику воздействеут эффект</param>
+        /// <param name="targetDer">На какую производную воздействеут эффект</param>
+        /// <param name="сonstanBuff">Константа, которую эффект прибавит к указанной производной</param>
+        public void SetOrChangeEffect(EPlayerType target, ECharacteristic targetChar, EDerivative targetDer, double сonstanBuff = 0)
         {
-            if (trigger.ContainsKey(stonetype))
+            //
+            if (effect.ContainsKey(target)) //
             {
-                trigger[stonetype] = (value, comparison);
-            }
-            else
-            {
-                trigger.Add(stonetype, (value, comparison));
-            }
-        }
-        public (int, char) GetTrigger(TriggerType stonetype)
-        {
-            return trigger[stonetype];
-        }
-        public (int, char) this[TriggerType param]
-        {
-            get
-            {
-                return trigger[param];
-            }
-            set
-            {
-                trigger[param] = value;
-            }
-        }
-
-        //_____________________ЭФФЕКТ СРАБАТЫВАНИЯ_____________________
-        /// <summary>
-        /// Эффекты срабатывания со всеми параметрами 
-        /// Как читать:
-        /// </summary>
-        protected Dictionary<Characteristic, Dictionary<Derivative, Effect>> effect = new Dictionary<Characteristic, Dictionary<Derivative, Effect>>();
-        public void SetEffectValue(Characteristic characteristic, Derivative derivative, int value)
-        {
-            if (effect.ContainsKey(characteristic))
-            {
-                if (effect[characteristic].ContainsKey(derivative))
+                //
+                if (effect[target].ContainsKey(targetChar)) //
                 {
-                    effect[characteristic][derivative].Value = value;
+                    //
+                    if (effect[target][targetChar].ContainsKey(targetDer)) //
+                    {
+                        //
+                        effect[target][targetChar][targetDer].ConstanBuff = сonstanBuff;
+                    }
+                    else
+                    {
+                        //
+                        effect[target][targetChar].Add(targetDer, new CommonEffect(сonstanBuff));
+                    }
                 }
                 else
                 {
-                    effect[characteristic].Add(derivative, new Effect(value));
+                    //
+                    effect[target].Add(targetChar, new Dictionary<EDerivative, CommonEffect> { [targetDer] = new CommonEffect(сonstanBuff) });
                 }
             }
             else
             {
-                effect.Add(characteristic, new Dictionary<Derivative, Effect> { [derivative] = new Effect(value) });
+                //
+                effect.Add(target, new Dictionary<ECharacteristic, Dictionary<EDerivative, CommonEffect>> { [targetChar] = new Dictionary<EDerivative, CommonEffect> { [targetDer] = new CommonEffect(сonstanBuff) } });
             }
         }
-        public Effect GetEffect(Characteristic characteristic, Derivative derivative)
+        /// <summary>
+        /// Установка/изменение эффекта, который будет расчитываться как % от указанного параметра
+        /// </summary>
+        /// <param name="target">На кого воздействеут эффект</param>
+        /// <param name="targetChar">На какую характеристику воздействеут эффект</param>
+        /// <param name="targetDer">На какую производную воздействеут эффект</param>
+        /// <param name="source">От кого скейлится эффект</param>
+        /// <param name="scaleChar">От какой характеристики скейлится эффект</param>
+        /// <param name="scaleDer">От какой производной скейлится эффект</param>
+        /// <param name="value">Коэффициент с которым происходит скейл</param>
+        public void SetOrChangeEffectScale(EPlayerType target, ECharacteristic targetChar, EDerivative targetDer, EPlayerType source, ECharacteristic scaleChar, EDerivative scaleDer, double value)
         {
-            return effect[characteristic][derivative];
-        }
-        public Effect this[Characteristic characteristic, Derivative derivative]
-        {
-            get
+            //
+            if (effect.ContainsKey(target)) //
             {
-                return effect[characteristic][derivative];
+                //
+                if (effect[target].ContainsKey(targetChar)) //
+                {
+                    //
+                    if (effect[target][targetChar].ContainsKey(targetDer)) //
+                    {
+                        //
+                        effect[target][targetChar][targetDer].SetOrChangeScale(source, scaleChar, scaleDer, value);
+                    }
+                    else
+                    {
+                        //
+                        effect[target][targetChar].Add(targetDer, new CommonEffect(source, scaleChar, scaleDer, value));
+                    }
+                }
+                else
+                {
+                    //
+                    effect[target].Add(targetChar, new Dictionary<EDerivative, CommonEffect> { [targetDer] = new CommonEffect(source, scaleChar, scaleDer, value) });
+                }
+            }
+            else
+            {
+                //
+                effect.Add(target, new Dictionary<ECharacteristic, Dictionary<EDerivative, CommonEffect>> { [targetChar] = new Dictionary<EDerivative, CommonEffect> { [targetDer] = new CommonEffect(source, scaleChar, scaleDer, value) } });
             }
         }
+
+
+
+        //_____________________МЕТОДЫ_____________________
+
+
+
+
     }
 }

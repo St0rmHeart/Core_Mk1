@@ -11,7 +11,8 @@ namespace Core_Mk1
     /// </summary>
     public class Perk : BasicDevEntity
     {
-        protected int perkLevel;
-        protected string characteristicRelated;
+        //_____________________КОНСТРУКТОР_____________________
+        public Perk(string name) : base(name) { }
+
     }
 }

@@ -11,6 +11,7 @@ namespace Core_Mk1
     /// </summary>
     public class Spell : BasicDevEntity
     {
+        public Spell(string name) : base(name) { }
         protected int manaCostFire;
         protected int manaCostEarth;
         protected int manaCostAir;
