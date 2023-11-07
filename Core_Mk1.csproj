@@ -46,7 +46,7 @@
     <Compile Include="classBasicDevEntity.cs" />
     <Compile Include="classCharacter.cs" />
     <Compile Include="classCustomDataStructures.cs" />
-    <Compile Include="сentralGameplay.cs" />
+    <Compile Include="staticclassCentralGameplay.cs" />
     <Compile Include="classEffect.cs" />
     <Compile Include="classEquipment.cs" />
     <Compile Include="classPerk.cs" />

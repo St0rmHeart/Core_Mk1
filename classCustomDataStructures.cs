@@ -22,14 +22,8 @@ namespace Core_Mk1
 
         //_____________________GET/SET_____________________
 
-        //get структуру
-        public Dictionary<ECharacteristic, Dictionary<EDerivative, double>> StatList
-        {
-            get { return statList; }
-        }
-
         /// <summary>
-        /// Установить все производные, какой-либо характеристики
+        /// Установить указанный набор значений производных какой-либо характеристики. Сохраняет значения уже существующих, неуказанных производных
         /// </summary>
         /// <param name="characteristic"> Характеристика, куда устанавливаем набор производных</param>
         /// <param name="value">Набор производных</param>
@@ -37,7 +31,11 @@ namespace Core_Mk1
         {
             if (statList.ContainsKey(characteristic))
             {
-                statList[characteristic] = value;
+                foreach (EDerivative derivative in value.Keys)
+                {
+                    if (statList[characteristic].ContainsKey(derivative)) { statList[characteristic][derivative] = value[derivative]; }
+                    else { statList[characteristic].Add(derivative, value[derivative]); }
+                }
             }
             else
             {
@@ -45,7 +43,11 @@ namespace Core_Mk1
             }
         }
 
-        //get набор производных указанной характеристики
+        /// <summary>
+        /// Вернуть набор производных указанной характеристики
+        /// </summary>
+        /// <param name="characteristic"></param>
+        /// <returns> Словарь: Ключ - производная <see cref="EDerivative"/>, значение - её значение <see cref="double"/> </returns>
         public Dictionary<EDerivative, double> this[ECharacteristic characteristic]
         {
             get
@@ -63,29 +65,29 @@ namespace Core_Mk1
         public void SetOrOverwriteStat(ECharacteristic characteristic, EDerivative derivative, double value)
         {
             //
-            if (StatList.ContainsKey(characteristic)) //
+            if (statList.ContainsKey(characteristic)) //
             {
                 //
-                if (StatList[characteristic].ContainsKey(derivative)) //
+                if (statList[characteristic].ContainsKey(derivative)) //
                 {
                     //
-                    StatList[characteristic][derivative] = value;
+                    statList[characteristic][derivative] = value;
                 }
                 else
                 {
                     //
-                    StatList[characteristic].Add(derivative, value);
+                    statList[characteristic].Add(derivative, value);
                 }
             }
             else
             {
                 //
-                StatList.Add(characteristic, new Dictionary<EDerivative, double> { [derivative] = value });
+                statList.Add(characteristic, new Dictionary<EDerivative, double> { [derivative] = value });
             }
         }
 
         /// <summary>
-        /// Установить новое/увеличить существующее значение конкретной производной конкретной характеристики
+        /// Установить новое/увеличить существующее значение конкретной производной конкретной характеристики на указанную величину
         /// </summary>
         /// <param name="characteristic">Характеристика</param>
         /// <param name="derivative">Производная указанной характеристики</param>
@@ -93,27 +95,45 @@ namespace Core_Mk1
         public void SetOrIncreaseStat(ECharacteristic characteristic, EDerivative derivative, double value)
         {
             //
-            if (StatList.ContainsKey(characteristic)) //
+            if (statList.ContainsKey(characteristic)) //
             {
                 //
-                if (StatList[characteristic].ContainsKey(derivative)) //
+                if (statList[characteristic].ContainsKey(derivative)) //
                 {
                     //
-                    StatList[characteristic][derivative] = StatList[characteristic][derivative] + value;
+                    statList[characteristic][derivative] = statList[characteristic][derivative] + value;
                 }
                 else
                 {
                     //
-                    StatList[characteristic].Add(derivative, value);
+                    statList[characteristic].Add(derivative, value);
                 }
             }
             else
             {
                 //
-                StatList.Add(characteristic, new Dictionary<EDerivative, double> { [derivative] = value });
+                statList.Add(characteristic, new Dictionary<EDerivative, double> { [derivative] = value });
             }
         }
+        /// <summary>
+        /// Вернуть список всех ключей - характеристик
+        /// </summary>
+        public List<ECharacteristic> Keys { get { return statList.Keys.ToList(); } }
 
 
+
+        //_____________________МЕТОДЫ_____________________
+
+        /// <summary>
+        /// Проверить словарь на существование производных для указанной характеристики
+        /// </summary>
+        /// <param name="characteristic">Характеристика</param>
+        /// <returns><see cref="bool"/> наличие производных для данной характеристики.</returns>
+        public bool ContainsKey(ECharacteristic characteristic) { return statList.ContainsKey(characteristic); }
+        /// <summary>
+        /// Очистить содержимое структры
+        /// </summary>
+        public void Clear() { statList.Clear(); }
+        
     }
 }

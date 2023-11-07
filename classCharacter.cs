@@ -25,12 +25,6 @@ namespace Core_Mk1
             this.level = level;
             this.xp = xp;
             this.gold = gold;
-
-            foreach (EBodyPart bodyPart in Enum.GetValues(typeof(EBodyPart)))
-            {
-                usedEquipment.Add(bodyPart, null);
-            }
-
         }
 
 
@@ -38,21 +32,21 @@ namespace Core_Mk1
         //_____________________ПОЛЯ_____________________
 
         //имя 
-        protected string name;
+        private string name;
         //уровень 
-        protected int level;
+        private int level;
         //накопленный опыт на уровне 
-        protected int xp;
+        private int xp;
         //накопленное золото
-        protected int gold;
+        private int gold;
         //базовые характеристики
-        protected Dictionary<ECharacteristic, int> characteristics = new Dictionary<ECharacteristic, int>();
+        private Dictionary<ECharacteristic, int> characteristics = new Dictionary<ECharacteristic, int>();
         //используемые перки
-        protected List<Perk> usedPerks = new List<Perk>();
+        private List<Perk> usedPerks = new List<Perk>();
         //носимое снаряжение
-        protected Dictionary<EBodyPart, Equipment> usedEquipment = new Dictionary<EBodyPart, Equipment>();
+        private Dictionary<EBodyPart, Equipment> usedEquipment = new Dictionary<EBodyPart, Equipment>();
         //используемые заклинания
-        protected List<Spell> usedSpells = new List<Spell>();
+        private List<Spell> usedSpells = new List<Spell>();
 
 
 
@@ -101,10 +95,10 @@ namespace Core_Mk1
         {
             get { return usedPerks; }
         }
-        //get словарь снаряжения
-        public Dictionary<EBodyPart, Equipment> UsedEquipment
+        //get список снаряжения
+        public List<Equipment> UsedEquipment
         {
-            get { return usedEquipment; }
+            get { return usedEquipment.Values.ToList(); }
         }
 
 

@@ -8,15 +8,63 @@ using System.Threading.Tasks;
 
 namespace Core_Mk1
 {
-    public interface IDerCalculator
+    /// <summary>
+    /// Калькулятор производных
+    /// </summary>
+    public abstract class DerivativesCalculator
     {
-        Dictionary<EDerivative, double> CalculateDerivatives();
-    }
-    public abstract class UniversalCharacteristicDerivativescCalculatorModule : IDerCalculator
-    {
-        protected UniversalCharacteristicDerivativescCalculatorModule(int value) { this.value = value; }
+        //_____________________КОНСТРУКТОР_____________________
+
+        /// <summary>
+        /// Стандарный конструктор для передачи потомкам
+        /// </summary>
+        /// <param name="value"> Значение расчитываемой характеристики</param>
+        protected DerivativesCalculator(int value, bool isInitGame) { this.value = value; this.isInitGame = isInitGame; }
+
+        //_____________________ПОЛЯ_____________________
+
+        //ячейка для значения характеристики
         protected double value;
+        //ячейка, покавыющая, проходит ли расчет производных в момент инициализации сражения
+        protected bool isInitGame;
+
+        //_____________________МЕТОДЫ_____________________
+
+        /// <summary>
+        /// Вернуть набор всех производных для конкретной характеристики, расчитанный от её значения
+        /// </summary>
+        /// <param name="characteristic">Характеристика, набор производных которой нужно рассчитать</param>
+        /// <param name="value">Значение характеристики</param>
+        /// <returns>Словарь расчитанных производных</returns>
+        public static Dictionary<EDerivative, double> GetDerivatives(ECharacteristic characteristic, int value, bool isInitGame)
+        {
+            switch (characteristic)
+            {
+                case ECharacteristic.strength:
+                    return new StrengthModule(value, isInitGame).CalculateDerivatives();
+                case ECharacteristic.dexterity:
+                    return new DexterityModule(value, isInitGame).CalculateDerivatives();
+                case ECharacteristic.endurance:
+                    return new EnduranceModule(value, isInitGame).CalculateDerivatives();
+                case ECharacteristic.fire:
+                    return new FireModule(value, isInitGame).CalculateDerivatives();
+                case ECharacteristic.water:
+                    return new WaterModule(value, isInitGame).CalculateDerivatives();
+                case ECharacteristic.air:
+                    return new AirModule(value, isInitGame).CalculateDerivatives();
+                case ECharacteristic.earth:
+                    return new EarthModule(value, isInitGame).CalculateDerivatives();
+                default: return null;
+            }
+        }
+
+        /// <summary>
+        ///Расчет производных, который реализует каждый потомок
+        /// </summary>
+        /// <returns>Словарь расчитанных производных</returns>
         public abstract Dictionary<EDerivative, double> CalculateDerivatives();
+
+
         public virtual double CalculateTerminationMult()
         {
             double result = 1;
@@ -30,9 +78,9 @@ namespace Core_Mk1
             return result;
         }
     }
-    public class StrengthDerivativesCalculatorModule : UniversalCharacteristicDerivativescCalculatorModule
+    public class StrengthModule : DerivativesCalculator
     {
-        public StrengthDerivativesCalculatorModule(int value) : base(value) { }
+        public StrengthModule(int value, bool isInitGame) : base(value, isInitGame) { }
         public double CalculateResistance()
         {
             double result;
@@ -51,9 +99,9 @@ namespace Core_Mk1
             return derivatives;
         }
     }
-    public class DexterityDerivativesCalculatorModule : UniversalCharacteristicDerivativescCalculatorModule
+    public class DexterityModule : DerivativesCalculator
     {
-        public DexterityDerivativesCalculatorModule(int value) : base(value) { }
+        public DexterityModule(int value, bool isInitGame) : base(value, isInitGame) { }
         public override Dictionary<EDerivative, double> CalculateDerivatives()
         {
             var derivatives = new Dictionary<EDerivative, double>
@@ -65,9 +113,9 @@ namespace Core_Mk1
             return derivatives;
         }
     }
-    public class EnduranceDerivativesCalculatorModule : UniversalCharacteristicDerivativescCalculatorModule
+    public class EnduranceModule : DerivativesCalculator
     {
-        public EnduranceDerivativesCalculatorModule(int value) : base(value) { }
+        public EnduranceModule(int value, bool isInitGame) : base(value, isInitGame) { }
         public override Dictionary<EDerivative, double> CalculateDerivatives()
         {
             var derivatives = new Dictionary<EDerivative, double>
@@ -76,8 +124,9 @@ namespace Core_Mk1
                 { EDerivative.terminationMult, CalculateTerminationMult() },
                 { EDerivative.addTurnChance, CalculateAddTurnChance() },
                 { EDerivative.maxHealth, CalculateMaxHealth()},
-                { EDerivative.currentHealth, CalculateMaxHealth()}
             };
+            if (isInitGame) { derivatives.Add(EDerivative.currentHealth, derivatives[EDerivative.maxHealth]); }
+            
             return derivatives;
         }
         public double CalculateMaxHealth()
@@ -87,9 +136,9 @@ namespace Core_Mk1
             return result;
         }
     }
-    public abstract class UniversalElementalCharacteristicDerivativesCalculatorModule : UniversalCharacteristicDerivativescCalculatorModule
+    public abstract class UniversalElementalModule : DerivativesCalculator
     {
-        public UniversalElementalCharacteristicDerivativesCalculatorModule(int value) : base(value) { }
+        public UniversalElementalModule(int value, bool isInitGame) : base(value, isInitGame) { }
         public override Dictionary<EDerivative, double> CalculateDerivatives()
         {
             var derivatives = new Dictionary<EDerivative, double>
@@ -98,8 +147,8 @@ namespace Core_Mk1
                 { EDerivative.terminationMult, CalculateTerminationMult() },
                 { EDerivative.addTurnChance, CalculateAddTurnChance() },
                 { EDerivative.maxMana, CalculateMaxMana() },
-                { EDerivative.currentMana, CalculateStartMana() }
             };
+            if (isInitGame) { derivatives.Add(EDerivative.currentMana, CalculateStartMana()); }
             return derivatives;
         }
         public virtual double CalculateMaxMana()
@@ -115,55 +164,20 @@ namespace Core_Mk1
             return result;
         }
     }
-    public class FireDerivativesCalculatorModule : UniversalElementalCharacteristicDerivativesCalculatorModule
+    public class FireModule : UniversalElementalModule
     {
-        public FireDerivativesCalculatorModule(int value) : base(value) { }
+        public FireModule(int value, bool isInitGame) : base(value, isInitGame) { }
     }
-    public class WaterDerivativesCalculatorModule : UniversalElementalCharacteristicDerivativesCalculatorModule
+    public class WaterModule : UniversalElementalModule
     {
-        public WaterDerivativesCalculatorModule(int value) : base(value) { }
+        public WaterModule(int value, bool isInitGame) : base(value, isInitGame) { }
     }
-    public class AirDerivativesCalculatorModule : UniversalElementalCharacteristicDerivativesCalculatorModule
+    public class AirModule : UniversalElementalModule
     {
-        public AirDerivativesCalculatorModule(int value) : base(value) { }
+        public AirModule(int value, bool isInitGame) : base(value, isInitGame) { }
     }
-    public class EarthDerivativesCalculatorModule : UniversalElementalCharacteristicDerivativesCalculatorModule
+    public class EarthModule : UniversalElementalModule
     {
-        public EarthDerivativesCalculatorModule(int value) : base(value) { }
-    }
-    public class DerivativesCalculator
-    {
-        public IDerCalculator IDerCalculatorModule;
-        public DerivativesCalculator(ECharacteristic characteristic, int value)
-        {
-            switch (characteristic)
-            {
-                case ECharacteristic.strength:
-                    IDerCalculatorModule = new StrengthDerivativesCalculatorModule(value);
-                    break;
-                case ECharacteristic.dexterity:
-                    IDerCalculatorModule = new DexterityDerivativesCalculatorModule(value);
-                    break;
-                case ECharacteristic.endurance:
-                    IDerCalculatorModule = new EnduranceDerivativesCalculatorModule(value);
-                    break;
-                case ECharacteristic.fire:
-                    IDerCalculatorModule = new FireDerivativesCalculatorModule(value);
-                    break;
-                case ECharacteristic.water:
-                    IDerCalculatorModule = new WaterDerivativesCalculatorModule(value);
-                    break;
-                case ECharacteristic.air:
-                    IDerCalculatorModule = new AirDerivativesCalculatorModule(value);
-                    break;
-                case ECharacteristic.earth:
-                    IDerCalculatorModule = new EarthDerivativesCalculatorModule(value);
-                    break;
-            }
-        }
-        public Dictionary<EDerivative, double> CalculateDerivatives()
-        {
-        return IDerCalculatorModule.CalculateDerivatives();
-        }
+        public EarthModule(int value, bool isInitGame) : base(value, isInitGame) { }
     }
 }

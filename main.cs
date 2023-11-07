@@ -21,16 +21,16 @@ namespace Core_Mk1
             Troll[ECharacteristic.air] = 15;
             Troll[ECharacteristic.earth] = 25;
 
-            Perk perk1 = new Perk("перк +50% хп");
-            perk1.SetOrChangeEffectScale(EPlayerType.self, ECharacteristic.endurance, EDerivative.maxHealth, EPlayerType.self, ECharacteristic.endurance, EDerivative.maxHealth, 0.5);
-            Equipment equipment1 = new Equipment(EBodyPart.head, "Шапка на +50% хп");
-            equipment1.SetOrChangeEffectScale(EPlayerType.self, ECharacteristic.endurance, EDerivative.maxHealth, EPlayerType.self, ECharacteristic.endurance, EDerivative.maxHealth, 0.5);
+            Perk perk1 = new Perk("перк +100% хп");
+            perk1.SetOrChangeEffectScale(EPlayerType.self, ECharacteristic.endurance, EDerivative.maxHealth, EPlayerType.self, ECharacteristic.endurance, EDerivative.maxHealth, 1);
+            Equipment equipment1 = new Equipment(EBodyPart.head, "Шапка на +100% хп");
+            equipment1.SetOrChangeEffectScale(EPlayerType.self, ECharacteristic.endurance, EDerivative.maxHealth, EPlayerType.self, ECharacteristic.endurance, EDerivative.maxHealth, 1);
 
             Troll.TryEquip(equipment1);
             Troll.UsedPerks.Add(perk1);
 
             Console.WriteLine("Тест создания персонажа 2:");
-            Character LakeBeast = new Character("Владычица озера");
+            Character LakeBeast = new Character("Старшая Нага");
             Console.WriteLine("\nТест изменения множества характеристик персонажа 2:");
             LakeBeast[ECharacteristic.strength] = 15;
             LakeBeast[ECharacteristic.dexterity] = 35;
@@ -94,7 +94,9 @@ namespace Core_Mk1
             Console.WriteLine("_____КОНЕЦ_____");*/
             Console.WriteLine("\nТест инициализации начала сражения");
             Console.WriteLine("_____НАЧАЛО_____");
-            СentralGameplay.InitGame(Troll, LakeBeast);
+            СentralGameplay.leftPlayer = new CharacterSlot(Troll);
+            СentralGameplay.rightPlayer = new CharacterSlot(LakeBeast);
+            СentralGameplay.InitGame();
             Console.WriteLine("_____КОНЕЦ_____");
             /*//не относящиеся к системе тесты
             Console.WriteLine(Characteristic.fire);
